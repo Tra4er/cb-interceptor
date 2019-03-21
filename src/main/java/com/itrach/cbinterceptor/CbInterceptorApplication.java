@@ -9,8 +9,8 @@ public class CbInterceptorApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext a = SpringApplication.run(CbInterceptorApplication.class, args);
-        Mine mine = a.getBean(Mine.class);
-        System.err.println(mine.meth());
+//        Mine mine = a.getBean(Mine.class);
+//        System.err.println(mine.meth());
     }
 
 }
