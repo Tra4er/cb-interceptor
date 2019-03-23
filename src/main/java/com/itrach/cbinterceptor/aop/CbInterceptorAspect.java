@@ -1,6 +1,8 @@
 package com.itrach.cbinterceptor.aop;
 
-import com.itrach.cbinterceptor.component.CallMetaStorage;
+import com.itrach.cbinterceptor.exception.BadRequestException;
+import com.itrach.cbinterceptor.service.MethodService;
+import com.itrach.cbinterceptor.service.UserService;
 import org.apache.commons.lang3.Validate;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,11 +18,12 @@ import java.util.Map;
 @Aspect
 public class CbInterceptorAspect {
 
-    private Map<String, Integer> counter = new HashMap<>();
-    private final CallMetaStorage callMetaStorage;
+    private final UserService userService;
+    private final MethodService methodService;
 
-    public CbInterceptorAspect(CallMetaStorage callMetaStorage) {
-        this.callMetaStorage = callMetaStorage;
+    public CbInterceptorAspect(UserService userService, MethodService methodService) {
+        this.userService = userService;
+        this.methodService = methodService;
     }
 
     @Pointcut("@annotation(com.itrach.cbinterceptor.annotation.CbInterceptor)")
@@ -28,7 +31,7 @@ public class CbInterceptorAspect {
     }
 
     @Around("cbInterceptorAnnotationPointcut()")
-    public String around(ProceedingJoinPoint joinPoint) {
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         HttpServletRequest request = null;
         for(Object o : args) {
@@ -38,26 +41,25 @@ public class CbInterceptorAspect {
         }
         Validate.notNull(request, "request parameter is mandatory: %s", joinPoint);
 
-        processUserData(joinPoint, request);
-
-//        HttpServletRequest a
-        if (counter.containsKey(request.getRemoteAddr())) {
-            counter.put(request.getRemoteAddr(), counter.get(request.getRemoteAddr()) + 1);
-        } else {
-            counter.put(request.getRemoteAddr(), 1);
-        }
-        System.err.println(counter);
-        System.err.println(joinPoint);
         try {
-            joinPoint.proceed();
-        } catch (Throwable e) {
-            e.printStackTrace();
+            processUserData(joinPoint, request);
+        } catch (BadRequestException e) {
+            return "Request blocked for this user: " + e.getMessage();
         }
-        System.err.println("AROUND");
-        return "new return";
+
+        try {
+            return joinPoint.proceed();
+        } catch (Throwable e) {
+            if (methodService.isErrorsExcited(request)) {
+                return "Method is unavailable.";
+            }
+            methodService.addExceptionForMethod(request);
+            throw e;
+        }
     }
 
-    private void processUserData(ProceedingJoinPoint joinPoint, HttpServletRequest request) {
+    private void processUserData(ProceedingJoinPoint joinPoint, HttpServletRequest request) throws BadRequestException {
+        userService.processUserMeta(request);
         // зберегти запит і подивитись скільки помилок і кількість запитів за період.
 //        callMetaStorage.setUserMetaStorageMap();
     }

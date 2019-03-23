@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Mine {
 
-    @CbInterceptor("asdewf")
+    @CbInterceptor
     public String meth() {
         System.err.println("ewpodk");
         return "return";

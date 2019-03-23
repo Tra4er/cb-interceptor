@@ -1,8 +1,6 @@
-package com.itrach.cbinterceptor.controller;
+package com.itrach.cbinterceptor.demo.controller;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.itrach.cbinterceptor.annotation.CbInterceptor;
-import com.itrach.cbinterceptor.annotation.Request;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,10 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 public class MainController {
 
     @GetMapping
-    @CbInterceptor("ksjdfh")
+    @CbInterceptor
     public String get(HttpServletRequest request) {
-        System.err.println("HERE " + request.getRemoteAddr());
         return "Response from Get";
+    }
+
+    @GetMapping("/exception")
+    @CbInterceptor
+    public String exception(HttpServletRequest request) throws Exception {
+        throw new Exception("Internal TEST Exception");
     }
 
 }
