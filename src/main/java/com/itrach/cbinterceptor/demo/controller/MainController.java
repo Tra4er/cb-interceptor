@@ -1,6 +1,7 @@
 package com.itrach.cbinterceptor.demo.controller;
 
 import com.itrach.cbinterceptor.annotation.CbInterceptor;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

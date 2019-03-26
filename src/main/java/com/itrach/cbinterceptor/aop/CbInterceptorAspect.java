@@ -11,8 +11,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @Aspect
@@ -41,8 +39,14 @@ public class CbInterceptorAspect {
         }
         Validate.notNull(request, "request parameter is mandatory: %s", joinPoint);
 
+        if (methodService.isMethodBlocked(request)){
+            return "This method is unavailable. End.";
+        }
+        if (userService.isMethodBlocked(request)){
+            return "This method is unavailable for you.";
+        }
         try {
-            processUserData(joinPoint, request);
+            userService.processUserMeta(request);
         } catch (BadRequestException e) {
             return "Request blocked for this user: " + e.getMessage();
         }
@@ -50,18 +54,10 @@ public class CbInterceptorAspect {
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
-            if (methodService.isErrorsExcited(request)) {
-                return "Method is unavailable.";
-            }
-            methodService.addExceptionForMethod(request);
+            methodService.handleMethodException(request);
+            userService.handleMethodException(request);
             throw e;
         }
     }
 
-    private void processUserData(ProceedingJoinPoint joinPoint, HttpServletRequest request) throws BadRequestException {
-        userService.processUserMeta(request);
-        // зберегти запит і подивитись скільки помилок і кількість запитів за період.
-//        callMetaStorage.setUserMetaStorageMap();
-    }
-    // builder
 }

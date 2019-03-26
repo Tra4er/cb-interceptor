@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface MethodService {
 
-    boolean isErrorsExcited(HttpServletRequest request);
-    void addExceptionForMethod(HttpServletRequest request);
+    boolean isMethodBlocked(HttpServletRequest request);
+
+    void handleMethodException(HttpServletRequest request);
 }

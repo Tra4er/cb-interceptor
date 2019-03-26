@@ -1,32 +1,47 @@
 package com.itrach.cbinterceptor.service.impl;
 
-import com.itrach.cbinterceptor.component.CallMetaStorage;
-import com.itrach.cbinterceptor.model.method.MethodMetaStorage;
+import com.itrach.cbinterceptor.config.Config;
+import com.itrach.cbinterceptor.repository.MethodMetaRepository;
 import com.itrach.cbinterceptor.service.MethodService;
 import com.itrach.cbinterceptor.utils.RequestUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class MethodServiceImpl implements MethodService {
 
-    public static final int MAX_ERRORS = 2;
+    private final Config config;
+    private final MethodMetaRepository callMetaRepository;
 
-    private final CallMetaStorage callMetaStorage;
-
-    public boolean isErrorsExcited(HttpServletRequest request) {
-        MethodMetaStorage methodMetaStorage = callMetaStorage.getMethodMetaStorageMap().get(RequestUtils.getMethod(request));
-//        boolean result
-        // check how long ago
-        return methodMetaStorage == null || methodMetaStorage.getErrorsCount() < MAX_ERRORS;
+    public boolean isMethodBlocked(HttpServletRequest request) {
+        CircularFifoQueue<LocalDateTime> methodError =
+                callMetaRepository.getMethodMetaByName(RequestUtils.getMethod(request));
+        if (methodError == null) {
+            return false;
+        }
+        LocalDateTime lastError = methodError.get(methodError.size() - 1);
+        if (lastError.plusSeconds(config.getMethodErrorCooldownSeconds()).isBefore(LocalDateTime.now())) {
+            return false;
+        }
+        return methodError.isAtFullCapacity();
     }
 
-    public void addExceptionForMethod(HttpServletRequest request) {
-        MethodMetaStorage methodMetaStorage = callMetaStorage.getMethodMetaStorageMap().get(RequestUtils.getMethod(request));
-        methodMetaStorage.setErrorsCount(methodMetaStorage.getErrorsCount() + 1);
+    // перевіряти чи сталася помилка методу для кількох користувачів.
+    // Якщо помилка тільки у одного то блокувати тільки того користувача. Якщо у багатьох то блокуємо метод для всіх.
+    public void handleMethodException(HttpServletRequest request) {
+        CircularFifoQueue<LocalDateTime> methodError =
+                callMetaRepository.getMethodMetaByName(RequestUtils.getMethod(request));
+        if (methodError == null) {
+            methodError = new CircularFifoQueue<>(config.getMethodErrorsCapacity());
+            methodError.add(LocalDateTime.now());
+            callMetaRepository.save(RequestUtils.getMethod(request), methodError);
+        }
+        methodError.add(LocalDateTime.now());
     }
 
 }
