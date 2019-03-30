@@ -1,6 +1,7 @@
 package com.itrach.cbinterceptor.aop;
 
 import com.itrach.cbinterceptor.exception.BadRequestException;
+import com.itrach.cbinterceptor.model.CBResponse;
 import com.itrach.cbinterceptor.service.MethodService;
 import com.itrach.cbinterceptor.service.UserService;
 import org.apache.commons.lang3.Validate;
@@ -40,15 +41,15 @@ public class CbInterceptorAspect {
         Validate.notNull(request, "request parameter is mandatory: %s", joinPoint);
 
         if (methodService.isMethodBlocked(request)){
-            return "This method is unavailable. End.";
+            return new CBResponse(20, "This method is unavailable. End.");
         }
         if (userService.isMethodBlocked(request)){
-            return "This method is unavailable for you.";
+            return new CBResponse(21, "This method is unavailable for you.");
         }
         try {
             userService.processUserMeta(request);
         } catch (BadRequestException e) {
-            return "Request blocked for this user: " + e.getMessage();
+            return new CBResponse(22, "Request blocked for this user: " + e.getMessage());
         }
 
         try {

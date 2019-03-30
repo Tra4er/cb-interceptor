@@ -34,6 +34,7 @@ public class MethodServiceImpl implements MethodService {
     // перевіряти чи сталася помилка методу для кількох користувачів.
     // Якщо помилка тільки у одного то блокувати тільки того користувача. Якщо у багатьох то блокуємо метод для всіх.
     public void handleMethodException(HttpServletRequest request) {
+        System.err.println("HERE exceptions");
         CircularFifoQueue<LocalDateTime> methodError =
                 callMetaRepository.getMethodMetaByName(RequestUtils.getMethod(request));
         if (methodError == null) {

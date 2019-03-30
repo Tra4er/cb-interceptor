@@ -1,7 +1,6 @@
 package com.itrach.cbinterceptor.demo.controller;
 
 import com.itrach.cbinterceptor.annotation.CbInterceptor;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +13,13 @@ public class MainController {
 
     @GetMapping
     @CbInterceptor
-    public String get(HttpServletRequest request) {
+    public Object get(HttpServletRequest request) {
         return "Response from Get";
     }
 
     @GetMapping("/exception")
     @CbInterceptor
-    public String exception(HttpServletRequest request) throws Exception {
+    public Object exception(HttpServletRequest request) throws Exception {
         throw new Exception("Internal TEST Exception");
     }
 
