@@ -38,12 +38,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean isMethodBlocked(HttpServletRequest request) {
+    public boolean isMethodFaulty(HttpServletRequest request) {
         UserMetadata userMetadata = userMetaRepository.getUserByIp(request.getRemoteAddr());
         if (userMetadata == null) {
             return false;
         }
-        return isMethodBlocked(RequestUtils.getMethod(request), userMetadata);
+        return isMethodFaulty(RequestUtils.getMethod(request), userMetadata);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    public boolean isMethodBlocked(String method, UserMetadata userMetadata) {
+    public boolean isMethodFaulty(String method, UserMetadata userMetadata) {
         CircularFifoQueue<LocalDateTime> errorMethod = userMetadata.getErrorCalls().get(method);
         if (errorMethod == null) {
             return false;

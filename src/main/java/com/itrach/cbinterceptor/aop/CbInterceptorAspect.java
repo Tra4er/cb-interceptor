@@ -1,5 +1,6 @@
 package com.itrach.cbinterceptor.aop;
 
+import com.itrach.cbinterceptor.config.Config;
 import com.itrach.cbinterceptor.exception.BadRequestException;
 import com.itrach.cbinterceptor.model.CBResponse;
 import com.itrach.cbinterceptor.service.MethodService;
@@ -12,15 +13,22 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Component
 @Aspect
 public class CbInterceptorAspect {
 
+    private final Config config;
     private final UserService userService;
     private final MethodService methodService;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public CbInterceptorAspect(UserService userService, MethodService methodService) {
+    public CbInterceptorAspect(Config config, UserService userService, MethodService methodService) {
+        this.config = config;
         this.userService = userService;
         this.methodService = methodService;
     }
@@ -33,17 +41,17 @@ public class CbInterceptorAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         HttpServletRequest request = null;
-        for(Object o : args) {
+        for (Object o : args) {
             if (o instanceof HttpServletRequest) {
                 request = (HttpServletRequest) o;
             }
         }
         Validate.notNull(request, "request parameter is mandatory: %s", joinPoint);
 
-        if (methodService.isMethodBlocked(request)){
+        if (methodService.isMethodFaulty(request)) {
             return new CBResponse(20, "This method is unavailable. End.");
         }
-        if (userService.isMethodBlocked(request)){
+        if (userService.isMethodFaulty(request)) {
             return new CBResponse(21, "This method is unavailable for you.");
         }
         try {
@@ -53,12 +61,25 @@ public class CbInterceptorAspect {
         }
 
         try {
-            return joinPoint.proceed();
+            return executorService.submit(() -> {
+                try {
+                    return joinPoint.proceed();
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }).get(config.getMethodTimeoutSeconds(), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            handleMethodError(request);
+            return "Method timeout.";
         } catch (Throwable e) {
-            methodService.handleMethodException(request);
-            userService.handleMethodException(request);
+            handleMethodError(request);
             throw e;
         }
+    }
+
+    private void handleMethodError(HttpServletRequest request) {
+        methodService.handleMethodException(request);
+        userService.handleMethodException(request);
     }
 
 }

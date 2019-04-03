@@ -18,7 +18,7 @@ public class MethodServiceImpl implements MethodService {
     private final Config config;
     private final MethodMetaRepository callMetaRepository;
 
-    public boolean isMethodBlocked(HttpServletRequest request) {
+    public boolean isMethodFaulty(HttpServletRequest request) {
         CircularFifoQueue<LocalDateTime> methodError =
                 callMetaRepository.getMethodMetaByName(RequestUtils.getMethod(request));
         if (methodError == null) {

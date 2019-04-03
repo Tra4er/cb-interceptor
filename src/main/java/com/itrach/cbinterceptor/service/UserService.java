@@ -8,7 +8,7 @@ public interface UserService {
 
     void processUserMeta(HttpServletRequest request) throws BadRequestException;
 
-    boolean isMethodBlocked(HttpServletRequest request);
+    boolean isMethodFaulty(HttpServletRequest request);
 
     void handleMethodException(HttpServletRequest request);
 }

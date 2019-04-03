@@ -22,6 +22,7 @@ public class ConfigService {
 
         configDTO.setMethodErrorCooldownSeconds(config.getMethodErrorCooldownSeconds());
         configDTO.setMethodErrorsCapacity(config.getMethodErrorsCapacity());
+        configDTO.setMethodTimeoutSeconds(config.getMethodTimeoutSeconds());
         return configDTO;
     }
 
@@ -35,5 +36,6 @@ public class ConfigService {
 
         config.setMethodErrorCooldownSeconds(configDTO.getMethodErrorCooldownSeconds());
         config.setMethodErrorsCapacity(configDTO.getMethodErrorsCapacity());
+        config.setMethodTimeoutSeconds(configDTO.getMethodTimeoutSeconds());
     }
 }

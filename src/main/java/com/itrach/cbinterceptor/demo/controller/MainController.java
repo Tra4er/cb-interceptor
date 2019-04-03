@@ -23,4 +23,11 @@ public class MainController {
         throw new Exception("Internal TEST Exception");
     }
 
+    @GetMapping("/timeout")
+    @CbInterceptor
+    public Object timeout(HttpServletRequest request) throws Throwable {
+        Thread.sleep(10000);
+        return "Response from long running method.";
+    }
+
 }

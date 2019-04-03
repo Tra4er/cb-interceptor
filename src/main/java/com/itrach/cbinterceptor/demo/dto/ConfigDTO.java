@@ -14,5 +14,6 @@ public class ConfigDTO {
 
     private int methodErrorCooldownSeconds;
     private int methodErrorsCapacity;
+    private int methodTimeoutSeconds = 1;
 
 }
