@@ -1,7 +1,5 @@
 package com.itrach.cbinterceptor.repository;
 
-import com.itrach.cbinterceptor.config.Config;
-import com.itrach.cbinterceptor.model.UserMetadata;
 import lombok.Data;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.springframework.stereotype.Repository;

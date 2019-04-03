@@ -115,7 +115,8 @@ public class UserServiceImpl implements UserService {
             methodError = new CircularFifoQueue<>(config.getUserErrorsCapacity());
             methodError.add(LocalDateTime.now());
             userMetadata.getErrorCalls().put(method, methodError);
+        } else {
+            methodError.add(LocalDateTime.now());
         }
-        methodError.add(LocalDateTime.now());
     }
 }

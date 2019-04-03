@@ -1,6 +1,5 @@
 package com.itrach.cbinterceptor.demo.controller;
 
-import com.itrach.cbinterceptor.config.Config;
 import com.itrach.cbinterceptor.demo.dto.ConfigDTO;
 import com.itrach.cbinterceptor.demo.service.ConfigService;
 import lombok.RequiredArgsConstructor;

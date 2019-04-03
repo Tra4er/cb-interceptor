@@ -40,8 +40,9 @@ public class MethodServiceImpl implements MethodService {
             methodError = new CircularFifoQueue<>(config.getMethodErrorsCapacity());
             methodError.add(LocalDateTime.now());
             callMetaRepository.save(RequestUtils.getMethod(request), methodError);
+        } else {
+            methodError.add(LocalDateTime.now());
         }
-        methodError.add(LocalDateTime.now());
     }
 
 }

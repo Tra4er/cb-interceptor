@@ -1,9 +1,6 @@
 package com.itrach.cbinterceptor.model;
 
-import com.itrach.cbinterceptor.config.Config;
-import com.itrach.cbinterceptor.exception.BadRequestException;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.time.LocalDateTime;
