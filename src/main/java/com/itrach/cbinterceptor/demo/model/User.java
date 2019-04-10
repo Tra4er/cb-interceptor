@@ -12,6 +12,9 @@ public class User {
     @Id
     @GeneratedValue
     private Long id;
+    private String email;
     private String name;
-    private String passportNumber;
+    private String secondName;
+    private String surname;
+    private String mailSubscriotion;
 }
