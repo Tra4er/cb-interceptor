@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<?> getUser() {
-        System.err.println(userRepository.findById(Long.valueOf("1")).get());
-        return new ResponseEntity<>(userRepository.findById(Long.valueOf("1")).get(), HttpStatus.OK);
+    public ResponseEntity<?> getUsers() {
+//        System.err.println(userRepository.findById(Long.valueOf("1")).get());
+        return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/mail/{mail}")
-    public ResponseEntity<?> getUserByMail(@PathVariable String mail) {
-        System.err.println(userRepository.findByEmail(mail).get());
-        return new ResponseEntity<>(userRepository.findByEmail(mail).get(), HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
+        System.err.println(userRepository.findById(id.longValue()));
+        return new ResponseEntity<>(userRepository.findById(id.longValue()), HttpStatus.OK);
     }
 }
