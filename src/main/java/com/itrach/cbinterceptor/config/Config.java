@@ -20,6 +20,6 @@ public class Config implements Serializable {
 
     private int methodErrorCooldownSeconds = 10;
     private int methodErrorsCapacity = 2;
-    private int methodTimeoutSeconds = 4;
+    private int methodTimeoutSeconds = 5;
 
 }
