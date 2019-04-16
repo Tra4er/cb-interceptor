@@ -67,7 +67,7 @@ public class CbInterceptorAspect {
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
-            }).get(config.getMethodTimeoutSeconds(), TimeUnit.MILLISECONDS);
+            }).get(config.getMethodTimeoutSeconds(), TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             handleMethodError(request);
             return new CBResponse(23, "Method timeout." + e.getMessage());
